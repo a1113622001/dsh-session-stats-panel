@@ -1,5 +1,10 @@
 # dsh-session-stats-panel
 
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D20-green.svg)
+![CI](https://img.shields.io/github/actions/workflow/status/a1113622001/dsh-session-stats-panel/ci.yml?branch=main&label=CI)
+[English](./README.en.md) · [中文](./README.md)
+
 DeepSeek Harness (cordis) **client plugin**：在页面右侧显示当前会话的统计面板：
 
 | 指标 | 说明 |
@@ -44,13 +49,23 @@ DeepSeek Harness (cordis) **client plugin**：在页面右侧显示当前会话�
 
 ## 安装（web 配置档）
 
+### 方式一：通过 bundle 清单（推荐）
+
+本插件自带 `cordis.patch.yml` bundle patch（`package.json` 的 `dsh.bundle.patch` 指向它），因此可直接以可安装插件方式启用并自动激活，无需手动添加 loader 行：
+
+```bash
+dsh plugin add github:a1113622001/dsh-session-stats-panel
+```
+
+### 方式二：从本地目录手动安装
+
 1. 安装依赖（等价于 `dsh plugin --profile web add <本目录>`）：
 
    ```powershell
    corepack pnpm --dir "$env:USERPROFILE\.dsh\profiles\web" add "C:\Users\baiyec\Desktop\Harness\plugins\dsh-session-stats-panel"
    ```
 
-2. 在 `$env:USERPROFILE\.dsh\profiles\web\cordis.patch.yml` 中追加 loader 行：
+2. 若未使用 bundle 清单，可在 `$env:USERPROFILE\.dsh\profiles\web\cordis.patch.yml` 中追加 loader 行（等价于本仓库 `cordis.patch.yml` 的内容）：
 
    ```yaml
    - insert:
@@ -59,6 +74,15 @@ DeepSeek Harness (cordis) **client plugin**：在页面右侧显示当前会话�
    ```
 
 3. 重启 web 服务（`dsh web`）。此后修改 `lib/client.js` 会被 client-hmr 轮询热更新（浏览器无需刷新）。
+
+## 开发
+
+```bash
+npm test              # 运行定价 / token 派生单元测试（node --test）
+node --check lib/*.js # 各 JS 文件语法检查
+```
+
+价格常量唯一规范在 `lib/pricing.js`（可单测）；`lib/client.js` 内联了一份浏览器实现，改价时请同步两处。
 
 ## 结构
 
