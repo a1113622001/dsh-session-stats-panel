@@ -23,9 +23,15 @@
   },
   "files": [
     "lib",
+    "test",
     "cordis.patch.yml",
-    "README.md"
+    "README.md",
+    "README.en.md",
+    "LICENSE"
   ],
+  "scripts": {
+    "test": "node --test"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/a1113622001/dsh-session-stats-panel.git"
