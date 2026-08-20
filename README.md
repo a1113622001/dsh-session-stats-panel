@@ -84,6 +84,8 @@ node --check lib/*.js # 各 JS 文件语法检查
 
 价格常量唯一规范在 `lib/pricing.js`（可单测）；`lib/client.js` 内联了一份浏览器实现，改价时请同步两处。
 
+开发规范见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
+
 ## 结构
 
 - `lib/index.js` — host 半边（空实现，仅为让 Loader 挂载该条目）；

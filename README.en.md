@@ -85,6 +85,8 @@ npm test        # run the pricing/derivation unit tests
 node --check lib/*.js   # syntax-check every JS file
 ```
 
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for house rules.
+
 ## License
 
 [MIT](./LICENSE)
