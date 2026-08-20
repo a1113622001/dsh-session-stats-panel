@@ -1,0 +1,7 @@
+# dsh-session-stats-panel bundle patch: serves the account-balance route and
+# mounts the browser panel. Registered as a bundle so
+# `dsh plugin add github:a1113622001/dsh-session-stats-panel` installs it as an
+# installable plugin that activates automatically.
+- insert:
+    - id: session-stats-panel
+      name: dsh-session-stats-panel
