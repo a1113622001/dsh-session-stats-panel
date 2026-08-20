@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Packed tarballs produced by `npm pack` / `pnpm pack`
+*.tgz
+*.tar.gz
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Local harness / dsh profile scratch
+*.local.patch.yml
