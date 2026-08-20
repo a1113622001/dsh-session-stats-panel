@@ -79,10 +79,13 @@ dsh plugin add github:a1113622001/dsh-session-stats-panel
 
 ```bash
 npm test              # 运行定价 / token 派生单元测试（node --test）
+npm run check:pricing # 核对 lib/pricing.js 与 lib/client.js 双副本定价是否一致
 node --check lib/*.js # 各 JS 文件语法检查
 ```
 
-价格常量唯一规范在 `lib/pricing.js`（可单测）；`lib/client.js` 内联了一份浏览器实现，改价时请同步两处。
+价格常量唯一规范在 `lib/pricing.js`（可单测）；`lib/client.js` 内联了一份浏览器实现，
+**改价只改 `pricing.js`**，然后运行 `npm run check:pricing` 确认两处一致（数值不同会直接报错，
+避免漏同步）。改价后记得用 `npm test` 回归。
 
 开发规范见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 

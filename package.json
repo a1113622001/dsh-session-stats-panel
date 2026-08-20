@@ -24,6 +24,7 @@
   "files": [
     "lib",
     "test",
+    "scripts",
     "cordis.patch.yml",
     "README.md",
     "README.en.md",
@@ -31,7 +32,9 @@
     "CONTRIBUTING.md"
   ],
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "check:pricing": "node scripts/check-pricing-sync.mjs",
+    "check": "npm run check:pricing"
   },
   "repository": {
     "type": "git",
