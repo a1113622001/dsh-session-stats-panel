@@ -3,6 +3,7 @@
 # 📊 dsh-session-stats-panel
 ### 💰 DeepSeek Harness 实时会话统计 · 官方峰谷计费 · 账户余额看板插件
 
+[![Marketplace](https://img.shields.io/badge/Harness%20Marketplace-Available-purple?style=flat-square&logo=deepseek)](https://github.com/a1113622001/dsh-session-stats-panel)
 [![Release](https://img.shields.io/npm/v/dsh-session-stats-panel?style=flat-square&color=blue&logo=npm)](https://www.npmjs.com/package/dsh-session-stats-panel)
 [![Node](https://img.shields.io/badge/Node.js-%3E%3D20-green?style=flat-square&logo=node.js)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
@@ -15,9 +16,30 @@
 
 ## 📖 项目简介
 
-**dsh-session-stats-panel** 是为 DeepSeek Harness 设计的会话计量与成本监控客户端插件。
+**dsh-session-stats-panel** 是已上架 **DeepSeek Harness 官方插件市场** 的会话计量与成本监控客户端插件。
 
 无侵入式挂载在页面右侧，实时展示当前会话的 **Token 缓存命中率**、**官方峰谷计费估算**、**DeepSeek 官方账户余额**、**运行时长** 与 **累计 Tokens**，让大模型 Agent 开发的成本与效率一目了然。
+
+---
+
+## 🛒 插件市场与安装方式
+
+### 方式 1：通过 Harness Web 插件市场一键安装（推荐）
+1. 打开 DeepSeek Harness Web 界面（默认 `http://127.0.0.1:3080`）；
+2. 进入 **`设置 (Settings)`** -> **`插件市场 (Plugin Inventory / Market)`**；
+3. 搜索 **`dsh-session-stats-panel`**，点击 **`安装 (Install)`** 即可完成热加载。
+
+### 方式 2：通过 Harness CLI 命令行安装
+```bash
+# 官方插件名一键添加
+dsh plugin add dsh-session-stats-panel
+
+# 或指定 profile 安装
+dsh plugin --profile web add dsh-session-stats-panel
+
+# 或直接从 GitHub 安装
+dsh plugin add github:a1113622001/dsh-session-stats-panel
+```
 
 ---
 
@@ -41,11 +63,18 @@
 
 ---
 
-## 🚀 安装与启用
+## 🔒 服务端凭据隔离安全设计
 
-```bash
-dsh plugin add github:a1113622001/dsh-session-stats-panel
 ```
+[前端浏览器 (Panel UI)]
+       │ (仅 GET 请求余额数值 / 无需传 Key)
+       ▼
+[Harness 服务端 /plugins/session-stats-panel/balance]
+       │ (从内部 Credentials 服务安全提取 Key 并请求官方 API)
+       ▼
+[DeepSeek 官方账户 API]
+```
+- API Key 始终安全驻留在后端 Node 进程内，前端仅接收格式化后的余额数字，杜绝任何密钥泄露隐患。
 
 ---
 
