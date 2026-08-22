@@ -21,7 +21,7 @@
  * price table or the derivation math surfaces as a mismatch.
  */
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -52,7 +52,7 @@ function extractModels(source) {
 
 /** Load the canonical pricing.js module and its own MODELS source table. */
 async function loadPricing() {
-	const pricing = await import(resolve(ROOT, "lib/pricing.js"));
+	const pricing = await import(pathToFileURL(resolve(ROOT, "lib/pricing.js")).href);
 	const src = readFileSync(resolve(ROOT, "lib/pricing.js"), "utf8");
 	return { pricing, modelsSrc: extractModels(src) };
 }
@@ -90,6 +90,7 @@ function compareBehaviour(pricing, clientModels, tableDrift) {
 	const probes = [
 		"deepseek-v4-flash",
 		"deepseek-v4-pro",
+		"deepseek-v4-flash-vision-exp",
 		"deepseek-v4-anything",
 		"gpt-4o",
 		"",

@@ -22,25 +22,20 @@ The panel registers in the framework's `shell.overlay` layer (a list slot — it
 
 ## Pricing
 
-Cost is estimated in the browser with a price table built into the plugin (CNY / million tokens, fetched from the [DeepSeek official pricing page](https://api-docs.deepseek.com/zh-cn/quick_start/pricing) on 2026-08-14; cache writes are billed at the cache-hit price).
+Cost is estimated in the browser with a price table built into the plugin (CNY / million tokens, fetched from the [DeepSeek official pricing page](https://api-docs.deepseek.com/zh-cn/quick_start/pricing); cache writes are billed at the cache-hit price).
 
-**Current price** (in effect until 2026-08-17 00:00 Beijing time):
-
-| Model | Cache-hit input | Cache-miss input | Output |
-| --- | --- | --- | --- |
-| deepseek-v4-flash | 0.02 | 1 | 2 |
-| deepseek-v4-pro | 0.025 | 3 | 6 |
-
-**From 2026-08-17 00:00, peak/off-peak pricing applies** (peak: Beijing time 9:00–12:00 and 14:00–18:00; otherwise off-peak, which is half of peak):
+**Official peak/off-peak pricing rules** (Peak windows on weekdays: Beijing time 9:00–12:00 and 14:00–18:00; off-peak is 50% discount; weekends are 100% all-day off-peak starting 2026-08-23 00:00 Beijing time):
 
 | Model | Period | Cache-hit input | Cache-miss input | Output |
 | --- | --- | --- | --- | --- |
-| deepseek-v4-flash | off-peak | 0.05 | 1.5 | 4.5 |
-| deepseek-v4-flash | peak | 0.10 | 3.0 | 9.0 |
-| deepseek-v4-pro | off-peak | 0.15 | 4.5 | 13.5 |
-| deepseek-v4-pro | peak | 0.30 | 9.0 | 27.0 |
+| deepseek-v4-flash | off-peak (weekends & off-peak hours) | 0.05 | 1.5 | 4.5 |
+| deepseek-v4-flash | peak (weekday peak hours) | 0.10 | 3.0 | 9.0 |
+| deepseek-v4-pro | off-peak (weekends & off-peak hours) | 0.15 | 4.5 | 13.5 |
+| deepseek-v4-pro | peak (weekday peak hours) | 0.30 | 9.0 | 27.0 |
+| deepseek-v4-flash-vision-exp | off-peak (weekends & off-peak hours) | 0.05 | 1.5 | 4.5 |
+| deepseek-v4-flash-vision-exp | peak (weekday peak hours) | 0.10 | 3.0 | 9.0 |
 
-The plugin auto-selects the price tier at "view time" (current / peak / off-peak; hover the cost row to see the tier). Session cost is an **estimate**: cumulative tokens cannot be sliced by time, so the whole amount is priced with whichever tier is active at view time; any other `deepseek-*` model falls back to the flash current price. To change prices, edit the `MODELS` / `PEAK_SCHEDULE_START` constants in `lib/pricing.js` (the client-hot-reload loop updates it without a restart).
+The plugin auto-selects the price tier at "view time" (peak / off-peak; hover the cost row to see the tier). Session cost is an **estimate**: cumulative tokens cannot be sliced by time, so the whole amount is priced with whichever tier is active at view time; any other `deepseek-*` model falls back to the flash price.
 
 ## Installation (web profile)
 

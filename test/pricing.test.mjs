@@ -14,12 +14,20 @@ import {
 } from "../lib/pricing.js";
 
 // Beijing time = UTC+8.
-// Beijing 2026-08-17 10:00 (peak window 9:00-12:00) == UTC 02:00 the same day.
+// Beijing 2026-08-17 10:00 (peak window 9:00-12:00, weekday) == UTC 02:00 the same day.
 const BEIJING_PEAK_1000 = Date.UTC(2026, 7, 17, 2, 0, 0);
 // Beijing 2026-08-17 03:00 (off-peak) == UTC 19:00 the previous day.
 const BEIJING_OFFPEAK_0300 = Date.UTC(2026, 7, 16, 19, 0, 0);
 // Beijing 2026-08-17 12:00 (boundary: peak ends at 12:00, so this is off-peak).
 const BEIJING_NOON = Date.UTC(2026, 7, 17, 4, 0, 0);
+
+// Weekend rule effective 2026-08-23 00:00 Beijing time:
+// 2026-08-23 10:00 BJ (Sunday) == UTC 02:00
+const BEIJING_SUNDAY_1000 = Date.UTC(2026, 7, 23, 2, 0, 0);
+// 2026-08-24 10:00 BJ (Monday, weekday peak) == UTC 02:00
+const BEIJING_MONDAY_1000 = Date.UTC(2026, 7, 24, 2, 0, 0);
+// 2026-08-29 15:00 BJ (Saturday, weekend off-peak) == UTC 07:00
+const BEIJING_SATURDAY_1500 = Date.UTC(2026, 7, 29, 7, 0, 0);
 
 const USAGE = {
 	uncachedInputTokens: 2_000_000,
@@ -31,15 +39,30 @@ const USAGE = {
 test("isDeepseek matches deepseek-* prefixes case-insensitively", () => {
 	assert.equal(isDeepseek("deepseek-v4-flash"), true);
 	assert.equal(isDeepseek("DeepSeek-v4-pro"), true);
+	assert.equal(isDeepseek("deepseek-v4-flash-vision-exp"), true);
 	assert.equal(isDeepseek("gpt-4o"), false);
 	assert.equal(isDeepseek(undefined), false);
 	assert.equal(isDeepseek(""), false);
 });
 
-test("priceFor picks the peak tier within a peak window", () => {
+test("priceFor picks the peak tier within a peak window on weekdays", () => {
 	const { price, tier } = priceFor("deepseek-v4-flash", BEIJING_PEAK_1000);
 	assert.equal(tier, "peak");
 	assert.deepEqual(price, { hit: 0.1, miss: 3, output: 9 });
+
+	const monday = priceFor("deepseek-v4-flash", BEIJING_MONDAY_1000);
+	assert.equal(monday.tier, "peak");
+	assert.deepEqual(monday.price, { hit: 0.1, miss: 3, output: 9 });
+});
+
+test("priceFor treats weekends as all-day off-peak from 2026-08-23 onwards", () => {
+	const sunday = priceFor("deepseek-v4-flash", BEIJING_SUNDAY_1000);
+	assert.equal(sunday.tier, "offpeak");
+	assert.deepEqual(sunday.price, { hit: 0.05, miss: 1.5, output: 4.5 });
+
+	const saturday = priceFor("deepseek-v4-flash-vision-exp", BEIJING_SATURDAY_1500);
+	assert.equal(saturday.tier, "offpeak");
+	assert.deepEqual(saturday.price, { hit: 0.05, miss: 1.5, output: 4.5 });
 });
 
 test("priceFor picks the off-peak tier outside peak windows", () => {
@@ -51,6 +74,12 @@ test("priceFor picks the off-peak tier outside peak windows", () => {
 test("priceFor treats the 12:00 boundary as off-peak (peak ends at 12:00)", () => {
 	const { tier } = priceFor("deepseek-v4-flash", BEIJING_NOON);
 	assert.equal(tier, "offpeak");
+});
+
+test("priceFor supports deepseek-v4-flash-vision-exp model", () => {
+	const { price, tier } = priceFor("deepseek-v4-flash-vision-exp", BEIJING_MONDAY_1000);
+	assert.equal(tier, "peak");
+	assert.deepEqual(price, { hit: 0.1, miss: 3, output: 9 });
 });
 
 test("priceFor falls back to flash pricing for unknown deepseek models", () => {

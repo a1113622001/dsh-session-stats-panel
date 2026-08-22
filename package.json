@@ -1,6 +1,6 @@
 {
   "name": "dsh-session-stats-panel",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DeepSeek Harness (cordis) client plugin: a right-side session stats panel showing average cache-hit rate, session cost, runtime, request count and cumulative tokens (DeepSeek pricing).",
   "type": "module",
   "main": "lib/index.js",
