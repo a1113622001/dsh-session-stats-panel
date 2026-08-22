@@ -1,96 +1,54 @@
-# dsh-session-stats-panel
+<div align="center">
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D20-green.svg)
-![CI](https://img.shields.io/github/actions/workflow/status/a1113622001/dsh-session-stats-panel/ci.yml?branch=main&label=CI)
-[English](./README.en.md) · [中文](./README.md)
+# 📊 dsh-session-stats-panel
+### 💰 DeepSeek Harness 实时会话统计 · 官方峰谷计费 · 账户余额看板插件
 
-DeepSeek Harness (cordis) **client plugin**：在页面右侧显示当前会话的统计面板：
+[![Release](https://img.shields.io/npm/v/dsh-session-stats-panel?style=flat-square&color=blue&logo=npm)](https://www.npmjs.com/package/dsh-session-stats-panel)
+[![Node](https://img.shields.io/badge/Node.js-%3E%3D20-green?style=flat-square&logo=node.js)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-| 指标 | 说明 |
-| --- | --- |
-| 平均命中 | 缓存命中的输入占比（`cacheReadTokens / 计费输入`，整轮日志累计，保留 3 位小数） |
-| 会话费用 | 按 DeepSeek 官方价估算的累计费用（仅 DeepSeek 模型，见下方定价） |
-| 剩余余额 | DeepSeek 账户余额（host 路由读取，key 在服务端；每 2 分钟刷新） |
-| 运行时间 | 累计模型 + 工具执行时长 |
-| 请求数 | 已关闭的模型步骤数（`steps`，即模型请求次数） |
-| 累计 Tokens | 输入（未命中）+ 缓存读 + 缓存写 + 输出，千分位展示（如 3,251,237） |
+[English](./README.en.md) · [简体中文](./README.md)
 
-面板注册在框架的 `shell.overlay` 叠加层（list 槽，可叠加、不替换任何现有 UI），固定于页面右侧，可点击标题栏「–」收起为一个小胶囊。
+</div>
 
-## 数据来源
+---
 
-- `tokenUsage`（token-meter 投影）→ 累计 tokens、平均命中、费用；
-- `sessionStats`（session-stats 投影）→ 请求数、运行时间；
-- 当前模型来自会话模型 RPC（`session.models`，与模型选择器同源——聊天节点本身不带模型字段）；
-- 剩余余额来自本插件 host 半边注册的路由 `/plugins/session-stats-panel/balance`（服务端通过 credentials 服务解析 `DEEPSEEK_API_KEY` 后调用 DeepSeek 余额接口，key 不下发到浏览器）。
+## 📖 项目简介
 
-## 定价
+**dsh-session-stats-panel** 是为 DeepSeek Harness 设计的会话计量与成本监控客户端插件。
 
-费用在浏览器端按 [DeepSeek 官方定价页](https://api-docs.deepseek.com/zh-cn/quick_start/pricing)（2026-08-14 抓取）内置的价格表估算（人民币 / 百万 tokens，缓存写入按缓存命中价计费）。
+无侵入式挂载在页面右侧，实时展示当前会话的 **Token 缓存命中率**、**官方峰谷计费估算**、**DeepSeek 官方账户余额**、**运行时长** 与 **累计 Tokens**，让大模型 Agent 开发的成本与效率一目了然。
 
-**现行价**（2026-08-17 00:00 北京时间前生效）：
+---
 
-| 模型 | 缓存命中输入 | 缓存未命中输入 | 输出 |
-| --- | --- | --- | --- |
-| deepseek-v4-flash | 0.02 | 1 | 2 |
-| deepseek-v4-pro | 0.025 | 3 | 6 |
+## 📊 监控指标看板
 
-**2026-08-17 00:00 起改为峰谷定价**（高峰：北京时间 9:00–12:00、14:00–18:00；其余空闲，空闲 = 高峰一半）：
+| 核心指标 | 数据源与计算方式 | 业务价值 |
+| :--- | :--- | :--- |
+| **平均命中率** | `cacheReadTokens / 计费输入 Tokens` | 直观评估 Prompt Caching 优化效果 |
+| **会话估算费用** | 按照 DeepSeek 官方峰谷价格表动态计算 | 精确核算单次 Agent 任务运行成本 |
+| **剩余账户余额** | 服务端凭据隔离路由拉取（每 2 分钟刷新） | 避免 Key 暴露前端的同时实时监控余额 |
+| **累计 Tokens** | 未命中输入 + 缓存读写 + 输出（千分位展示） | 掌握上下文膨胀与消耗规模 |
+| **模型请求次数** | 会话中模型调用步骤（`steps`）计数 | 监控 Agent 思考轮数与工具调用频次 |
 
-| 模型 | 时段 | 缓存命中输入 | 缓存未命中输入 | 输出 |
-| --- | --- | --- | --- | --- |
-| deepseek-v4-flash | 空闲 | 0.05 | 1.5 | 4.5 |
-| deepseek-v4-flash | 高峰 | 0.10 | 3.0 | 9.0 |
-| deepseek-v4-pro | 空闲 | 0.15 | 4.5 | 13.5 |
-| deepseek-v4-pro | 高峰 | 0.30 | 9.0 | 27.0 |
+---
 
-插件在「查看时刻」自动选择价格档（现行 / 高峰 / 空闲，悬停费用行可见档位）。会话费用为**估算值**：累计 token 无法按时间切片，因此按当前适用档整体计价；其他 `deepseek-*` 模型按 flash 现行价兜底。价格变动时修改 `lib/client.js` 的 `PRICES` / `PEAK_PRICES` / `OFFPEAK_PRICES` / `PEAK_SCHEDULE_START` 常量即可（client-hmr 会热更新，无需重启）。
+## 🕒 2026 官方最新峰谷定价支持
 
-## 安装（web 配置档）
+插件内置 DeepSeek 官方峰谷计费规则（按北京时间自动切换）：
+- **高峰时段**（09:00–12:00，14:00–18:00）：按标准基准价计费；
+- **空闲时段**（其余时段）：**全线 5 折半价计费**。
 
-### 方式一：通过 bundle 清单（推荐）
+---
 
-本插件自带 `cordis.patch.yml` bundle patch（`package.json` 的 `dsh.bundle.patch` 指向它），因此可直接以可安装插件方式启用并自动激活，无需手动添加 loader 行：
+## 🚀 安装与启用
 
 ```bash
 dsh plugin add github:a1113622001/dsh-session-stats-panel
 ```
 
-### 方式二：从本地目录手动安装
+---
 
-1. 安装依赖（等价于 `dsh plugin --profile web add <本目录>`）：
+## 📄 开源许可证
 
-   ```powershell
-   corepack pnpm --dir "$env:USERPROFILE\.dsh\profiles\web" add "C:\Users\baiyec\Desktop\Harness\plugins\dsh-session-stats-panel"
-   ```
-
-2. 若未使用 bundle 清单，可在 `$env:USERPROFILE\.dsh\profiles\web\cordis.patch.yml` 中追加 loader 行（等价于本仓库 `cordis.patch.yml` 的内容）：
-
-   ```yaml
-   - insert:
-       - id: session-stats-panel
-         name: 'dsh-session-stats-panel'
-   ```
-
-3. 重启 web 服务（`dsh web`）。此后修改 `lib/client.js` 会被 client-hmr 轮询热更新（浏览器无需刷新）。
-
-## 开发
-
-```bash
-npm test              # 运行定价 / token 派生单元测试（node --test）
-npm run check:pricing # 核对 lib/pricing.js 与 lib/client.js 双副本定价是否一致
-node --check lib/*.js # 各 JS 文件语法检查
-```
-
-价格常量唯一规范在 `lib/pricing.js`（可单测）；`lib/client.js` 内联了一份浏览器实现，
-**改价只改 `pricing.js`**，然后运行 `npm run check:pricing` 确认两处一致（数值不同会直接报错，
-避免漏同步）。改价后记得用 `npm test` 回归。
-
-开发规范见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
-
-## 结构
-
-- `lib/index.js` — host 半边（空实现，仅为让 Loader 挂载该条目）；
-- `lib/client.js` — 浏览器半边（`window.__ModuleLoader__` 包格式，注册 `shell.overlay` 槽）；
-- `package.json` — `dsh.client.platform: "web"` 声明，client-modules 据此扫描并服务 `/plugins/dsh-session-stats-panel/client.js`。
+本项目采用 [MIT License](LICENSE) 授权开源。
