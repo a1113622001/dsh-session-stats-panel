@@ -3,7 +3,7 @@
 # 📊 dsh-session-stats-panel
 ### 💰 DeepSeek Harness 实时会话统计 · 官方峰谷计费 · 账户余额看板插件
 
-[![Marketplace](https://img.shields.io/badge/Harness%20Marketplace-Available-purple?style=flat-square&logo=deepseek)](https://github.com/a1113622001/dsh-session-stats-panel)
+[![Marketplace](https://img.shields.io/badge/Harness%20Marketplace-Available-purple.svg?style=flat-square&logo=deepseek)](https://github.com/a1113622001/dsh-session-stats-panel)
 [![Release](https://img.shields.io/npm/v/dsh-session-stats-panel?style=flat-square&color=blue&logo=npm)](https://www.npmjs.com/package/dsh-session-stats-panel)
 [![Node](https://img.shields.io/badge/Node.js-%3E%3D20-green?style=flat-square&logo=node.js)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
@@ -65,16 +65,27 @@ dsh plugin add github:a1113622001/dsh-session-stats-panel
 
 ## 🔒 服务端凭据隔离安全设计
 
+```mermaid
+flowchart LR
+    subgraph Browser ["🌐 前端浏览器 (Panel UI)"]
+        UI["会话面板看板 (仅 GET 请求余额数值 / 0 密钥暴露)"]
+    end
+
+    subgraph Backend ["🖥️ Harness 后端服务"]
+        Route["/plugins/session-stats-panel/balance 路由"]
+        Cred["Credentials 服务 (本地存储安全解析)"]
+    end
+
+    subgraph Official ["☁️ DeepSeek 官方接口"]
+        API["DeepSeek 官方账户余额 API"]
+    end
+
+    UI -->|GET 轮询| Route
+    Route --> Cred
+    Cred -->|附带 Key 请求| API
+    API -->|返回 Balance 数据| Route
+    Route -->|仅下发纯数值| UI
 ```
-[前端浏览器 (Panel UI)]
-       │ (仅 GET 请求余额数值 / 无需传 Key)
-       ▼
-[Harness 服务端 /plugins/session-stats-panel/balance]
-       │ (从内部 Credentials 服务安全提取 Key 并请求官方 API)
-       ▼
-[DeepSeek 官方账户 API]
-```
-- API Key 始终安全驻留在后端 Node 进程内，前端仅接收格式化后的余额数字，杜绝任何密钥泄露隐患。
 
 ---
 
