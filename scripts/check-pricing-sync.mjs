@@ -88,17 +88,27 @@ function compareBehaviour(pricing, clientModels, tableDrift) {
 	// against an independently-derivable model table + the same math is
 	// sufficient. The real drift risk is the TABLE; the math is tiny and stable.
 	const probes = [
+		"deepseek-flash",
 		"deepseek-v4-flash",
-		"deepseek-v4-pro",
 		"deepseek-v4-flash-vision-exp",
+		"deepseek-v4-pro",
+		"deepseek-v4-pro-0813",
 		"deepseek-v4-anything",
 		"gpt-4o",
 		"",
 		undefined,
 	];
+	// Monday 10:00 BJ (peak), Monday 03:00 BJ (off-peak), Monday 12:00 BJ (boundary),
+	// Sunday 10:00 BJ (weekend -> off-peak).
+	const instants = [
+		Date.UTC(2026, 7, 17, 2, 0, 0),
+		Date.UTC(2026, 7, 16, 19, 0, 0),
+		Date.UTC(2026, 7, 17, 4, 0, 0),
+		Date.UTC(2026, 7, 23, 2, 0, 0),
+	];
 	const diffs = [];
 	for (const model of probes) {
-		for (const nowMs of [Date.UTC(2026, 7, 17, 2, 0, 0), Date.UTC(2026, 7, 16, 19, 0, 0), Date.UTC(2026, 7, 17, 4, 0, 0)]) {
+		for (const nowMs of instants) {
 			const { price } = pricing.priceFor(model, nowMs);
 			if (tableDrift && typeof tableDrift[model ?? "*"] !== "undefined") {
 				const cmp = tableDrift[model === "*" ? "*" : model] ?? tableDrift["*"];
@@ -140,6 +150,10 @@ async function main() {
 	}
 
 	// Whole-table comparison (including the "*" fallback) is the drift signal.
+	// Layer the behavioural probes on top so a table that matches but is wired
+	// up differently still fails the check.
+	problems.push(...compareBehaviour(pricing, clientTab, tableDrift));
+
 	const report = {
 		ok: problems.length === 0,
 		tableDrift: tableDrift,

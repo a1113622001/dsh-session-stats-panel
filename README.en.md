@@ -24,18 +24,20 @@ The panel registers in the framework's `shell.overlay` layer (a list slot — it
 
 Cost is estimated in the browser with a price table built into the plugin (CNY / million tokens, fetched from the [DeepSeek official pricing page](https://api-docs.deepseek.com/zh-cn/quick_start/pricing); cache writes are billed at the cache-hit price).
 
-**Official peak/off-peak pricing rules** (Peak windows on weekdays: Beijing time 9:00–12:00 and 14:00–18:00; off-peak is 50% discount; weekends are 100% all-day off-peak starting 2026-08-23 00:00 Beijing time):
+**Official peak/off-peak pricing rules** (peak windows are weekdays only, Beijing time 09:00–12:00 and 14:00–18:00; everything else — including all of Saturday and Sunday — is off-peak, priced at half the peak rate):
 
 | Model | Period | Cache-hit input | Cache-miss input | Output |
 | --- | --- | --- | --- | --- |
-| deepseek-v4-flash | off-peak (weekends & off-peak hours) | 0.05 | 1.5 | 4.5 |
-| deepseek-v4-flash | peak (weekday peak hours) | 0.10 | 3.0 | 9.0 |
-| deepseek-v4-pro | off-peak (weekends & off-peak hours) | 0.15 | 4.5 | 13.5 |
+| deepseek-flash | off-peak | 0.02 | 1 | 4 |
+| deepseek-flash | peak (weekday peak hours) | 0.04 | 2 | 8 |
+| deepseek-v4-pro | off-peak | 0.15 | 4.5 | 13.5 |
 | deepseek-v4-pro | peak (weekday peak hours) | 0.30 | 9.0 | 27.0 |
-| deepseek-v4-flash-vision-exp | off-peak (weekends & off-peak hours) | 0.05 | 1.5 | 4.5 |
-| deepseek-v4-flash-vision-exp | peak (weekday peak hours) | 0.10 | 3.0 | 9.0 |
 
-The plugin auto-selects the price tier at "view time" (peak / off-peak; hover the cost row to see the tier). Session cost is an **estimate**: cumulative tokens cannot be sliced by time, so the whole amount is priced with whichever tier is active at view time; any other `deepseek-*` model falls back to the flash price.
+CNY per million tokens; cache writes are billed at the cache-hit price.
+
+`deepseek-flash` (DeepSeek-V4.1-Flash) and `deepseek-v4-pro` (DeepSeek-V4-Pro-0813) are the current official ids. The retired `deepseek-v4-flash` / `deepseek-v4-flash-vision-exp` ids are still callable — requests are served by DeepSeek-V4.1-Flash and billed at Flash prices — so they share the Flash row. Versioned ids (`deepseek-v4-pro-0813`, `deepseek-v4-flash-0731`) resolve to their family rather than the fallback, and any other `deepseek-*` model falls back to the Flash price.
+
+The plugin auto-selects the price tier at "view time" (peak / off-peak; hover the cost row to see the tier). Session cost is an **estimate**: cumulative tokens cannot be sliced by time, so the whole amount is priced with whichever tier is active at view time.
 
 ## Installation (web profile)
 

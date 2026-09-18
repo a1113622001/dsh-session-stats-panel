@@ -58,10 +58,18 @@ dsh plugin add github:a1113622001/dsh-session-stats-panel
 ## 🕒 2026 官方最新峰谷定价支持
 
 插件内置 DeepSeek 官方最新峰谷计费规则（按北京时间自动切换）：
-- **工作日高峰时段**（周一至周五 09:00–12:00，14:00–18:00）：按标准基准价计费；
-- **工作日空闲时段**（其余时段）：**全线 5 折半价计费**；
-- **周末全天特惠**（2026年8月23日起周六、周日全天）：**全天统一按照低谷/空闲时段 5 折计费**；
-- **模型覆盖**：原生支持 `deepseek-v4-flash`、`deepseek-v4-pro`、`deepseek-v4-flash-vision-exp` 及历史/兜底模型。
+- **高峰时段**（周一至周五 09:00–12:00，14:00–18:00）：按标准基准价计费；
+- **空闲时段**（其余全部时段，含周六、周日全天）：**价格为高峰时段的一半**；
+- **模型覆盖**：原生支持 `deepseek-flash`（DeepSeek-V4.1-Flash）与 `deepseek-v4-pro`（DeepSeek-V4-Pro-0813）；兼容已下线的 `deepseek-v4-flash` / `deepseek-v4-flash-vision-exp`（请求仍由 V4.1-Flash 提供服务，按 Flash 价计费）；带版本后缀的 id（如 `deepseek-v4-pro-0813`）会自动归入所属系列，未知 `deepseek-*` 模型按 Flash 价兜底。
+
+单位：**元 / 百万 tokens**，缓存写入按缓存命中价计费。
+
+| 模型 | 时段 | 缓存命中输入 | 缓存未命中输入 | 输出 |
+| :--- | :--- | ---: | ---: | ---: |
+| `deepseek-flash` | 空闲 | 0.02 | 1 | 4 |
+| `deepseek-flash` | 高峰 | 0.04 | 2 | 8 |
+| `deepseek-v4-pro` | 空闲 | 0.15 | 4.5 | 13.5 |
+| `deepseek-v4-pro` | 高峰 | 0.30 | 9.0 | 27.0 |
 
 ---
 
